@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import TrelloCreate from "./TrelloCreate";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
-import { setActiveBoard } from "../actions";
+import { sort, setActiveBoard } from "../actions";
 import { Link } from "react-router-dom";
 
 const ListsContainer = styled.div`
@@ -16,17 +16,29 @@ const ListsContainer = styled.div`
 
 class TrelloBoard extends PureComponent {
   componentDidMount() {
+    // set active trello board here
     const { boardID } = this.props.match.params;
 
     this.props.dispatch(setActiveBoard(boardID));
   }
 
   onDragEnd = result => {
-    const { destination } = result;
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) {
       return;
     }
+
+    this.props.dispatch(
+      sort(
+        source.droppableId,
+        destination.droppableId,
+        source.index,
+        destination.index,
+        draggableId,
+        type
+      )
+    );
   };
 
   render() {
